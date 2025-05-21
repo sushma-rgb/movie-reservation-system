@@ -1,0 +1,22 @@
+# Ignore environment files
+.env
+
+# Ignore build output
+/bin/
+/dist/
+/build/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore editor/IDE files
+.vscode/
+.idea/
+*.swp
+
+# Ignore Go module cache
+/vendor/
+
+# Ignore logs
+*.log
