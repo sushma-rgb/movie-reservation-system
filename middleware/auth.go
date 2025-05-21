@@ -1,41 +1,67 @@
 package middleware
 
 import (
+	"fmt"
 	"movie-reservation/config"
 	"movie-reservation/models"
 	"net/http"
+	"os"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("secret-key")
-
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Just get the raw token from header
 		tokenString := c.GetHeader("Authorization")
-		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
+		if tokenString == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token missing"})
 			c.Abort()
 			return
 		}
 
-		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+		// Parse the token
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
+			// Validate the signing method
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
 
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token: " + err.Error()})
 			c.Abort()
 			return
 		}
 
-		claims := token.Claims.(jwt.MapClaims)
-		c.Set("userID", uint(claims["id"].(float64)))
-		c.Set("role", claims["role"])
+		// Extract claims
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
+
+		userIDFloat, ok := claims["id"].(float64)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID in token"})
+			c.Abort()
+			return
+		}
+
+		role, ok := claims["role"].(string)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid role in token"})
+			c.Abort()
+			return
+		}
+
+		// Set in context
+		c.Set("userID", uint(userIDFloat))
+		c.Set("role", role)
 		c.Next()
 	}
 }

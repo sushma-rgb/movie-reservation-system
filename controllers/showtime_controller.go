@@ -11,7 +11,7 @@ import (
 // Admin can add showtime for a movie
 func AddShowtime(c *gin.Context) {
 	var showtime models.Showtime
-	if err := c.ShouldBindJSON(&showtime); err != nil {
+	if err := c.Bind(&showtime); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

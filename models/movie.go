@@ -10,3 +10,12 @@ type Movie struct {
 	Poster      string     `json:"poster"`
 	Showtimes   []Showtime `json:"showtimes"`
 }
+
+type Input struct {
+	Id          int
+	Title       string
+	Description string
+	Genre       string
+	Poster      string
+	Showtimes   []Showtime
+}

@@ -66,7 +66,6 @@ func ReserveSeats(c *gin.Context) {
 }
 func GetAvailableSeats(c *gin.Context) {
 	showtimeID := c.Param("id")
-
 	var showtime models.Showtime
 	if err := config.DB.First(&showtime, showtimeID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Showtime not found"})
@@ -79,6 +78,7 @@ func GetAvailableSeats(c *gin.Context) {
 		"showtime_id":     showtime.ID,
 		"available_seats": availableSeats,
 	})
+
 }
 func CancelReservation(c *gin.Context) {
 	reservationID := c.Param("id")

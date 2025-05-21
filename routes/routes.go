@@ -7,7 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine) {
+func SetupRoutes() *gin.Engine {
+	r := gin.Default()
 	// Public routes
 	r.POST("/signup", controllers.Signup)
 	r.POST("/login", controllers.Login)
@@ -18,8 +19,10 @@ func SetupRoutes(r *gin.Engine) {
 	{
 		userGroup.GET("/me", controllers.GetProfile)
 		userGroup.POST("/reserve", controllers.ReserveSeats)
+		userGroup.GET("/movies", controllers.GetAllMovies)
+
 		userGroup.GET("/showtimes/:id/available", controllers.GetAvailableSeats)
-		userGroup.DELETE("/reservation/:id/cancel", controllers.CancelReservation)
+
 		userGroup.DELETE("/reservation/:id/cancel", middleware.ReservationOwnerMiddleware(), controllers.CancelReservation)
 	}
 
@@ -36,4 +39,5 @@ func SetupRoutes(r *gin.Engine) {
 		adminGroup.PUT("/showtimes/:id", controllers.UpdateShowtime)
 		adminGroup.DELETE("/showtimes/:id", controllers.DeleteShowtime)
 	}
+	return r
 }

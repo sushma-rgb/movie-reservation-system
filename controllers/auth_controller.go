@@ -5,6 +5,7 @@ import (
 	"movie-reservation/models"
 	"movie-reservation/utils"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -12,12 +13,16 @@ import (
 
 func Signup(c *gin.Context) {
 	var input models.User
-	if err := c.Bind(&input); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Hash password
+	if input.Email == "" || input.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email and password are required"})
+		return
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
@@ -26,9 +31,9 @@ func Signup(c *gin.Context) {
 
 	user := models.User{
 		Name:     input.Name,
-		Email:    input.Email,
+		Email:    strings.ToLower(input.Email),
 		Password: string(hashedPassword),
-		Role:     "user", // default
+		Role:     "user",
 	}
 
 	if err := config.DB.Create(&user).Error; err != nil {
@@ -43,12 +48,17 @@ func Login(c *gin.Context) {
 	var input models.User
 	var user models.User
 
-	if err := c.Bind(&input); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+	if input.Email == "" || input.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email and password are required"})
+		return
+	}
+
+	if err := config.DB.Where("email = ?", strings.ToLower(input.Email)).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
@@ -65,4 +75,13 @@ func Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+func GetProfile(c *gin.Context) {
+	userID := c.MustGet("userID").(uint)
+	role := c.MustGet("role").(string)
+
+	c.JSON(http.StatusOK, gin.H{
+		"user_id": userID,
+		"role":    role,
+	})
 }

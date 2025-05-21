@@ -2,18 +2,14 @@ package main
 
 import (
 	"movie-reservation/config"
-
-	"github.com/gin-gonic/gin"
+	"movie-reservation/routes"
 )
 
 func main() {
 	config.ConnectDB()
 
-	r := gin.Default()
+	r := routes.SetupRoutes()
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Movie Reservation Backend is Running!"})
-	})
+	r.Run(":8080")
 
-	r.Run(":8080") // Start server
 }
