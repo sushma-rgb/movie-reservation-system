@@ -132,37 +132,6 @@
 			"response": []
 		},
 		{
-			"name": "upload image",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "file",
-							"type": "file",
-							"src": "/C:/Users/qsp-developers/Pictures/pexels-alice-watkins-1272385019-24012179.jpg"
-						}
-					]
-				},
-				"url": {
-					"raw": "http://localhost:8080/api/images/upload",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"images",
-						"upload"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "user details",
 			"request": {
 				"method": "GET",
@@ -189,44 +158,6 @@
 					"path": [
 						"user",
 						"me"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "add role",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"bd\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/showtimes/available?id=1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"showtimes",
-						"available"
-					],
-					"query": [
-						{
-							"key": "id",
-							"value": "1"
-						}
 					]
 				}
 			},
